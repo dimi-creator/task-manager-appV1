@@ -1,38 +1,28 @@
-# ===============================
-# 1️⃣ Étape de base : Image PHP + Apache
-# ===============================
+# Étape 1 : Image PHP avec Apache
 FROM php:8.2-apache
 
-# Activer les extensions nécessaires à Laravel
-RUN docker-php-ext-install pdo pdo_mysql
+# Installer les extensions nécessaires à Laravel
+RUN apt-get update && apt-get install -y \
+    zip unzip git curl && \
+    docker-php-ext-install pdo pdo_mysql
 
 # Installer Composer
 COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
-# Définir le répertoire de travail
+# Définir le répertoire de travail (on reste dans /var/www/html)
 WORKDIR /var/www/html
 
-
-# Copier le reste des fichiers
+# Copier les fichiers du backend dans le conteneur
 COPY . .
 
-# Donner les bons droits pour Laravel
+# Installer les dépendances Laravel
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+# Donner les bons droits à Laravel
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# ===============================
-# 2️⃣ Étape de build : Installer dépendances & config Laravel
-# ===============================
-RUN composer install --no-dev --optimize-autoloader 
-
-# Générer la clé d'application (si absente)
-RUN php artisan key:generate --force || true
-
-# Lancer les migrations automatiquement (en ignorant les erreurs s'il n'y a pas encore de base)
-RUN php artisan migrate --force || true
-
-# ===============================
-# 3️⃣ Étape finale : Démarrage du serveur
-# ===============================
+# Exposer le port utilisé par Laravel
 EXPOSE 10000
 
+# Commande de démarrage
 CMD php artisan serve --host=0.0.0.0 --port=10000
