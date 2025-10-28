@@ -1,0 +1,92 @@
+/* Pagination */
+.pagination {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.page-item {
+    margin: 0 2px;
+}
+
+.page-link {
+    position: relative;
+    display: block;
+    padding: 0.5rem 0.75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    color: #007bff;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border-radius: 4px;
+}
+
+.page-link:hover {
+    color: #0056b3;
+    text-decoration: none;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+}
+
+.page-item.active .page-link {
+    z-index: 1;
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #fff;
+    border-color: #dee2e6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .pagination {
+        flex-wrap: wrap;
+    }
+    
+    .page-item {
+        margin: 2px;
+    }
+    
+    .page-link {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* Loading state */
+.loading-state {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+}
+
+/* No tasks message */
+.no-tasks {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Task list container */
+.tasks-list-wrapper {
+    min-height: 300px; /* Ensure there's space for loading state */
+    position: relative;
+}
+
+/* Pagination info */
+.pagination-info {
+    text-align: center;
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-top: 10px;
+}

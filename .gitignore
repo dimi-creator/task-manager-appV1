@@ -1,0 +1,69 @@
+
+# Dependencies
+/node_modules
+/vendor
+/.pnp
+.pnp.js
+Homestead.                
+Homestead.yaml             
+
+# Testing
+/coverage
+
+# Production
+/build
+/dist
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+/.fleet           
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backend specific
+/backend/bootstrap/cache/*
+/backend/storage/*.key
+/backend/storage/debugbar/*
+/backend/storage/logs/*
+!/backend/storage/logs/.gitignore
+/backend/storage/framework/*
+!/backend/storage/framework/views
+!/backend/storage/framework/cache
+!/backend/storage/framework/sessions
+/public/storage
+/storage/app/private/*
+/storage/debugbar/*
+.phpunit.result.cache      
+/.phpunit.cache           
+
+
+# Frontend specific
+/frontend/node_modules
+/frontend/.next
+/frontend/out
+/frontend/build

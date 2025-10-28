@@ -1,0 +1,47 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
+.app-container {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Suppression des marges et paddings par défaut */
+h1, h2, h3, p {
+    margin: 0;
+    padding: 0;
+}
+
+/* Styles pour le contenu principal */
+.main-content {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Styles pour les pages d'authentification */
+.auth-page {
+    width: 100%;
+    min-height: calc(100vh - 56px); /* Hauteur de l'écran moins la hauteur de la navbar */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-image: url('../public/images/tache_image.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* Ajustement pour les petits écrans */
+@media (max-width: 768px) {
+    .auth-page {
+        padding: 10px;
+    }
+}
