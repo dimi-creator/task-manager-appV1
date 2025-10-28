@@ -1,0 +1,40 @@
+# ===============================
+# 1️⃣ Étape de base : Image PHP + Apache
+# ===============================
+FROM php:8.2-apache
+
+# Activer les extensions nécessaires à Laravel
+RUN docker-php-ext-install pdo pdo_mysql
+
+# Installer Composer
+COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+
+# Définir le répertoire de travail
+WORKDIR /var/www/html
+
+# Copier les fichiers du projet
+COPY composer.json composer.lock ./
+
+# Copier le reste des fichiers
+COPY . .
+
+# Donner les bons droits pour Laravel
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# ===============================
+# 2️⃣ Étape de build : Installer dépendances & config Laravel
+# ===============================
+RUN composer install --no-dev --optimize-autoloader
+
+# Générer la clé d'application (si absente)
+RUN php artisan key:generate --force || true
+
+# Lancer les migrations automatiquement (en ignorant les erreurs s'il n'y a pas encore de base)
+RUN php artisan migrate --force || true
+
+# ===============================
+# 3️⃣ Étape finale : Démarrage du serveur
+# ===============================
+EXPOSE 10000
+
+CMD php artisan serve --host=0.0.0.0 --port=10000
