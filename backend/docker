@@ -12,8 +12,6 @@ COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 # Définir le répertoire de travail
 WORKDIR /var/www/html
 
-# Copier les fichiers du projet
-COPY composer.json composer.lock ./
 
 # Copier le reste des fichiers
 COPY . .
@@ -24,7 +22,7 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 # ===============================
 # 2️⃣ Étape de build : Installer dépendances & config Laravel
 # ===============================
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+RUN composer install --no-dev --optimize-autoloader 
 
 # Générer la clé d'application (si absente)
 RUN php artisan key:generate --force || true
