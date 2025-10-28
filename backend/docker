@@ -24,7 +24,7 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 # ===============================
 # 2️⃣ Étape de build : Installer dépendances & config Laravel
 # ===============================
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 # Générer la clé d'application (si absente)
 RUN php artisan key:generate --force || true
