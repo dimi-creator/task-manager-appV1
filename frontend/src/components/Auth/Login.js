@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from '../../hooks/useAuth';
@@ -104,10 +104,10 @@ const Login = () => {
                     
                     <div className="links-container">
                         <div className="forgot-password">
-                            <a href="/forgot-password">Mot de passe oublié ?</a>
+                            <Link to="/forgot-password">Mot de passe oublié ?</Link>
                         </div>
                         <div className="register-link">
-                            <p>Vous n'avez pas de compte ? <a href="/register">S'inscrire</a></p>
+                            <p>Vous n'avez pas de compte ? <Link to="/register">S'inscrire</Link></p>
                         </div>
                     </div>
                 </form>

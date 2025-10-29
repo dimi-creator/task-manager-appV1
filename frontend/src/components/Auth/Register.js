@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from '../../hooks/useAuth';
@@ -115,7 +115,7 @@ const Register = () => {
                     <button type="submit" className="btn btn-primary w-100">Register</button>
                 </form>
                 <div className="text-center mt-4">
-                    <p className="text-muted">Already have an account? <a href="/login" className="text-decoration-none">Sign in</a></p>
+                    <p className="text-muted">Already have an account? <Link to="/login" className="text-decoration-none">Sign in</Link></p>
                 </div>
             </div>
         </div>
