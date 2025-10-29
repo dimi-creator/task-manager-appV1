@@ -1,55 +1,147 @@
+/* --- CONTENEUR GÉNÉRAL --- */
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    padding: 2rem;
+}
+
+/* --- CARTE DE CONNEXION --- */
 .login-form {
-    background-color: rgba(255, 255, 255, 0.85);
-    padding: 2.5rem;
-    border-radius: 10px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 3rem 2.5rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
     width: 100%;
-    max-width: 450px;
+    max-width: 420px;
     margin: 1rem;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.login-form:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3);
+}
+
+/* --- TITRE --- */
 .login-form h2 {
-    color: #333;
-    margin-bottom: 1.5rem;
+    color: #2d2d2d;
+    margin-bottom: 2rem;
     text-align: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
 }
 
+/* --- CHAMPS DE FORMULAIRE --- */
 .login-form .form-control {
+    display: block;
     margin-bottom: 1.5rem;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    padding: 0.9rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
     width: 100%;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
+.login-form .form-control:focus {
+    border-color: #6e8efb;
+    box-shadow: 0 0 5px rgba(110, 142, 251, 0.4);
+}
+
+/* --- BOUTON DE CONNEXION --- */
 .login-form .btn-primary {
+    display: block;
     width: 100%;
-    padding: 0.75rem;
-    background-color: #6e8efb;
+    padding: 0.9rem 1rem;
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
     border: none;
-    border-radius: 5px;
-    color: white;
+    border-radius: 4px; /* Coins plus carrés pour un look rectangulaire */
+    color: #fff;
     font-weight: 600;
+    font-size: 1rem;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    text-align: center;
+    margin: 1.5rem 0; /* Espacement vertical */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .login-form .btn-primary:hover {
-    background-color: #5a7df4;
+    background: linear-gradient(135deg, #5a7df4, #9b63e6);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
+/* --- LIENS ET TEXTE --- */
 .login-form .text-center {
     text-align: center;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
+    color: #555;
 }
 
 .login-form a {
     color: #6e8efb;
+    font-weight: 500;
     text-decoration: none;
+    transition: color 0.3s;
 }
 
 .login-form a:hover {
+    color: #5a7df4;
     text-decoration: underline;
+}
+
+/* --- LIENS SOUS LE FORMULAIRE --- */
+.links-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-top: 0.5rem;
+    width: 100%;
+}
+
+.forgot-password,
+.register-link {
+    text-align: center;
+    width: 100%;
+}
+
+.forgot-password a,
+.register-link a {
+    display: inline-block;
+    font-size: 0.9rem;
+    color: #6e8efb;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+}
+
+.forgot-password a:hover,
+.register-link a:hover {
+    color: #5a7df4;
+    background-color: rgba(110, 142, 251, 0.1);
+    text-decoration: none;
+}
+
+/* --- ANIMATION D'APPARITION --- */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-form {
+    animation: fadeInUp 0.6s ease;
 }

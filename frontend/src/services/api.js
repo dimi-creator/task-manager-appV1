@@ -1,9 +1,10 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'http://127.0.0.1:8000/api', // Change this to your backend API URL
+    baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000/api', // Change this to your backend API URL
     headers: {
         'Content-Type': 'application/json',
+
     },
 });
 
@@ -42,7 +43,7 @@ export const markTaskAsCompleted = async (taskId) => {
 };
 
 export const api = axios.create({
-    baseURL: 'http://127.0.0.1:8000/api',
+    baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000/api',
 });
 
 // Additional functions for filtering tasks can be added here

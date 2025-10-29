@@ -10,11 +10,17 @@ const Navbar = () => {
     const history = useHistory();
     const [isOpen, setIsOpen] = useState(false);
 
-    const handleLogout = () => {
-        logout();
-        toast.info('Vous avez été déconnecté avec succès');
-        history.push('/login');
-        setIsOpen(false);
+    const handleLogout = async () => {
+        try {
+            await logout();
+            toast.info('Vous avez été déconnecté avec succès');
+            history.push('/login');
+        } catch (error) {
+            console.error('Erreur lors de la déconnexion:', error);
+            toast.error('Une erreur est survenue lors de la déconnexion');
+        } finally {
+            setIsOpen(false);
+        }
     };
 
     const toggleMenu = () => {
@@ -95,7 +101,7 @@ const Navbar = () => {
                                     Connexion
                                 </Link>
                                 <Link 
-                                    className="btn btn-primary" 
+                                    className="btn btn-primary rounded-pill" 
                                     to="/register"
                                     onClick={() => setIsOpen(false)}
                                 >

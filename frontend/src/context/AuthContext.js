@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useCallback, useContext } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -31,10 +31,26 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     // Configuration de base d'Axios
-    axios.defaults.baseURL = 'http://localhost:8000/api';
+    axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
     axios.defaults.headers.common['Accept'] = 'application/json';
     axios.defaults.headers.common['Content-Type'] = 'application/json';
     axios.defaults.withCredentials = true;
+
+    // Intercepteur pour gérer les erreurs d'authentification
+    axios.interceptors.response.use(
+        response => response,
+        error => {
+            if (error.response?.status === 401) {
+                // Si l'utilisateur n'est pas authentifié
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                setUser(null);
+                delete axios.defaults.headers.common['Authorization'];
+                history.push('/login');
+            }
+            return Promise.reject(error);
+        }
+    );
 
     // Fonction de connexion
     const login = useCallback(async (credentials) => {
@@ -82,23 +98,26 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     // Fonction de déconnexion
-    const logout = useCallback(() => {
-        // Supprimer les données d'authentification
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        delete axios.defaults.headers.common['Authorization'];
-        
-        setUser(null);
-        toast.info('Vous avez été déconnecté avec succès');
-        
-        // Rediriger vers la page de connexion
-        history.push('/login');
+    const logout = useCallback(async () => {
+        try {
+            await axios.post('/logout');
+        } catch (error) {
+            console.error('Erreur lors de la déconnexion:', error);
+            throw error; // Propagez l'erreur pour la gérer dans le composant
+        } finally {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            delete axios.defaults.headers.common['Authorization'];
+            setUser(null);
+            toast.info('Vous avez été déconnecté avec succès');
+            history.push('/login');
+        }
     }, [history]);
 
     // Fonction d'inscription
     const register = useCallback(async (userData) => {
         try {
-            const response = await axios.post('/register', {
+            await axios.post('/register', {
                 ...userData,
                 password_confirmation: userData.password
             });

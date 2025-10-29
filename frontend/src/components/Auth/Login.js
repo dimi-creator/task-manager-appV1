@@ -94,19 +94,20 @@ const Login = () => {
                         />
                     </div>
                     
-                    <div className="form-actions">
+                    <button 
+                        type="submit" 
+                        className="btn btn-primary"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Connexion en cours...' : 'Se connecter'}
+                    </button>
+                    
+                    <div className="links-container">
                         <div className="forgot-password">
                             <a href="/forgot-password">Mot de passe oublié ?</a>
                         </div>
-                        
-                        <button type="submit" className="btn btn-primary">
-                            {isLoading ? 'Connexion en cours...' : 'Se connecter'}
-                        </button>
-                        
                         <div className="register-link">
-                            <p>Vous n'avez pas de compte ?{' '}
-                                <a href="/register">S'inscrire</a>
-                            </p>
+                            <p>Vous n'avez pas de compte ? <a href="/register">S'inscrire</a></p>
                         </div>
                     </div>
                 </form>
