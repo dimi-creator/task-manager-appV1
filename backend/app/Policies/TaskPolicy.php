@@ -8,6 +8,14 @@ use App\Models\User;
 class TaskPolicy
 {
     /**
+     * Determine if the given task can be viewed by the user.
+     */
+    public function view(User $user, Task $task): bool
+    {
+        return $user->id === $task->user_id;
+    }
+
+    /**
      * Determine if the given task can be updated by the user.
      */
     public function update(User $user, Task $task): bool

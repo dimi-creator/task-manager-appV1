@@ -7,13 +7,24 @@ use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum')->except(['index', 'show']);
+    }
     public function index(Request $request)
     {
+        // Vérifier que l'utilisateur est authentifié
+        if (!auth()->check()) {
+            return response()->json(['message' => 'Non autorisé'], 401);
+        }
+
         // Par défaut, on affiche 6 tâches par page
         $perPage = $request->input('per_page', 6);
         $page = $request->input('page', 1);
         
-        $query = Task::with('user');
+        // Filtrer les tâches par l'utilisateur connecté
+        $query = Task::with('user')
+                    ->where('user_id', auth()->id());
         
         // Si on a un filtre de statut
         if ($request->has('status')) {
@@ -97,6 +108,12 @@ class TaskController extends Controller
                 'Access-Control-Allow-Credentials' => 'true'
             ]);
         }
+    }
+
+    public function show(Task $task)
+    {
+        $this->authorize('view', $task);
+        return response()->json($task);
     }
 
     public function update(Request $request, Task $task)

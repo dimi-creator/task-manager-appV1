@@ -35,6 +35,12 @@ export const AuthProvider = ({ children }) => {
     axios.defaults.headers.common['Accept'] = 'application/json';
     axios.defaults.headers.common['Content-Type'] = 'application/json';
     axios.defaults.withCredentials = true;
+    
+    // Configuration des en-têtes CORS
+    axios.defaults.headers.common['Access-Control-Allow-Origin'] = window.location.origin;
+    axios.defaults.headers.common['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
+    axios.defaults.headers.common['Access-Control-Allow-Headers'] = 'Content-Type, Authorization';
+    axios.defaults.headers.common['Access-Control-Allow-Credentials'] = 'true';
 
     // Intercepteur pour gérer les erreurs d'authentification
     axios.interceptors.response.use(
@@ -67,32 +73,44 @@ export const AuthProvider = ({ children }) => {
                 device_name: 'browser'
             }, {
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Access-Control-Allow-Origin': window.location.origin,
+                    'Access-Control-Allow-Credentials': 'true'
                 },
                 withCredentials: true
             });
             
             console.log('Réponse du serveur:', response.data);
             
-            if (response.data && response.data.token) {
-                const { token, user } = response.data;
+            if (response.data && response.data.token && response.data.user) {
+                const { token, user: userData } = response.data;
                 
                 // Stocker le token et les données utilisateur
                 localStorage.setItem('token', token);
-                localStorage.setItem('user', JSON.stringify(user));
+                localStorage.setItem('user', JSON.stringify(userData));
                 
                 // Configurer l'en-tête d'authentification par défaut
                 axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                 
                 // Mettre à jour l'état utilisateur
-                setUser(user);
+                setUser(userData);
                 
-                return { success: true };
+                console.log('Utilisateur connecté avec succès:', userData);
+                return { success: true, user: userData };
             } else {
-                throw new Error('Réponse du serveur invalide');
+                const error = new Error('Réponse du serveur invalide');
+                error.response = { status: 500 };
+                throw error;
             }
         } catch (error) {
             console.error('Erreur de connexion:', error);
+            // Si l'erreur ne contient pas de réponse, on en crée une
+            if (!error.response) {
+                const newError = new Error('Erreur de connexion au serveur');
+                newError.response = { status: 0, data: { message: 'Impossible de se connecter au serveur' } };
+                throw newError;
+            }
             throw error;
         }
     }, []);

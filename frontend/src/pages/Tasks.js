@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -14,6 +15,9 @@ const Tasks = () => {
     const [editingTask, setEditingTask] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showTaskForm, setShowTaskForm] = useState(false);
+    const history = useHistory();
+    const [isFirstLoad, setIsFirstLoad] = useState(true);
     
     // État pour la pagination
     const [pagination, setPagination] = useState({
@@ -36,7 +40,7 @@ const Tasks = () => {
             setLoading(true);
             const token = localStorage.getItem('token');
             if (!token) {
-                window.location.href = '/login';
+                history.push('/login');
                 return;
             }
             
@@ -79,20 +83,22 @@ const Tasks = () => {
             console.error('Erreur lors de la récupération des tâches:', err);
             setError('Impossible de charger les tâches. Veuillez réessayer.');
             if (err.response?.status === 401) {
-                window.location.href = '/login';
+                history.push('/login');
             }
         } finally {
             setLoading(false);
         }
-    }, [API_URL]); // On ne dépend plus de pagination.perPage
+    }, [API_URL, history]); // Ajout de history dans les dépendances
 
     // Chargement initial des tâches
     useEffect(() => {
         // Utiliser une fonction asynchrone auto-exécutée
         (async () => {
             await fetchTasks(1, filters);
+            setIsFirstLoad(false);
         })();
-    }, []); // Ne dépend que du montage du composant
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Le tableau vide est intentionnel - on ne veut exécuter ceci qu'au montage
     
     // Effet séparé pour gérer les changements de filtres
     useEffect(() => {
@@ -103,13 +109,13 @@ const Tasks = () => {
             
             return () => clearTimeout(timer);
         }
-    }, [filters]); // Se déclenche uniquement quand les filtres changent
+    }, [filters, fetchTasks]); // Dépend de filters et fetchTasks
 
     const handleAddOrUpdateTask = useCallback(async (taskData) => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
-                window.location.href = '/login';
+                history.push('/login');
                 return;
             }
             
@@ -151,13 +157,13 @@ const Tasks = () => {
             console.error('Erreur lors de l\'opération sur la tâche:', error);
             toast.error(`Erreur lors de ${editingTask ? 'la mise à jour' : 'l\'ajout'} de la tâche`);
         }
-    }, [API_URL, editingTask, fetchTasks, filters, pagination.currentPage]);
+    }, [API_URL, editingTask, fetchTasks, filters, pagination.currentPage, history]);
     
     const handleUpdateTask = useCallback(async (updatedTask) => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
-                window.location.href = '/login';
+                history.push('/login');
                 return;
             }
             
@@ -183,7 +189,7 @@ const Tasks = () => {
             console.error('Erreur lors de la mise à jour de la tâche:', error);
             toast.error('Erreur lors de la mise à jour de la tâche');
         }
-    }, [API_URL, fetchTasks, filters, pagination.currentPage]);
+    }, [API_URL, fetchTasks, filters, pagination.currentPage, history]);
     
     // Gestion du changement de page
     const handlePageChange = useCallback((newPage) => {
@@ -216,7 +222,7 @@ const Tasks = () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
-                window.location.href = '/login';
+                history.push('/login');
                 return;
             }
             
@@ -244,19 +250,59 @@ const Tasks = () => {
         } catch (error) {
             console.error('Erreur lors de la suppression de la tâche:', error);
             toast.error('Erreur lors de la suppression de la tâche');
+            if (error.response?.status === 401) {
+                history.push('/login');
+            }
         }
-    }, [API_URL, fetchTasks, filters, pagination.currentPage, pagination.perPage, pagination.total]);
+    }, [API_URL, fetchTasks, filters, pagination.currentPage, pagination.perPage, pagination.total, history]);
 
     // Supprimer handleFilterTasks car nous utilisons maintenant le filtrage côté serveur
 
 
-    // Afficher un indicateur de chargement uniquement au premier chargement
-    if (loading && tasks.length === 0) {
+    // Afficher un indicateur de chargement uniquement pendant le chargement initial
+    if (loading && isFirstLoad) {
         return (
             <div className="d-flex justify-content-center align-items-center" style={{ height: '50vh' }}>
                 <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Chargement...</span>
+                    <span className="visually-hidden">Chargement de vos tâches...</span>
                 </div>
+            </div>
+        );
+    }
+    
+    // Si pas de tâches après le chargement, afficher le formulaire de création
+    if (tasks.length === 0) {
+        return (
+            <div className="container mt-5">
+                <div className="row justify-content-center">
+                    <div className="col-md-8">
+                        <div className="card">
+                            <div className="card-header text-center">
+                                <h2>Bienvenue dans votre gestionnaire de tâches</h2>
+                            </div>
+                            <div className="card-body text-center">
+                                <p className="lead">Vous n'avez pas encore de tâches. Commencez par en créer une !</p>
+                                <button 
+                                    className="btn btn-primary btn-lg"
+                                    onClick={() => setShowTaskForm(true)}
+                                >
+                                    <i className="bi bi-plus-circle me-2"></i>Créer ma première tâche
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {/* Formulaire de création de tâche */}
+                <TaskForm 
+                    show={showTaskForm}
+                    onHide={() => setShowTaskForm(false)}
+                    onSubmit={(taskData) => {
+                        handleAddOrUpdateTask(taskData);
+                        setShowTaskForm(false);
+                    }}
+                    task={null}
+                />
             </div>
         );
     }

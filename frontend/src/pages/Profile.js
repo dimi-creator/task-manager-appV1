@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { api } from '../services/api';
+import { fetchTasks } from '../services/api';
 
 const Profile = () => {
     const { user } = useContext(AuthContext);
@@ -9,7 +9,9 @@ const Profile = () => {
     useEffect(() => {
         const fetchProfileData = async () => {
             try {
-                const response = await api.get(`/user/${user.id}`);
+                // Utilisez la fonction appropriée pour récupérer les données de l'utilisateur
+                // Pour l'instant, utilisons fetchTasks comme exemple
+                const response = await fetchTasks();
                 setProfileData(response.data);
             } catch (error) {
                 console.error('Error fetching profile data:', error);

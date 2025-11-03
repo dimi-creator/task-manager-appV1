@@ -29,8 +29,12 @@ return Application::configure(basePath: dirname(__DIR__))
         //     $decay = 1   // Durée en minutes
         // );
         
+        // Configuration CORS
         $middleware->api(\Illuminate\Http\Middleware\HandleCors::class);
         $middleware->api(\Illuminate\Routing\Middleware\SubstituteBindings::class);
+        
+        // Désactiver le middleware de limitation de débit pour l'API
+        $middleware->throttleApi(60, 1);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

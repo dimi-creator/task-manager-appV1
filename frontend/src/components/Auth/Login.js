@@ -15,8 +15,10 @@ const Login = () => {
     // Rediriger si l'utilisateur est déjà connecté
     useEffect(() => {
         if (isAuthenticated) {
+            console.log('Utilisateur authentifié, redirection...');
             // Vérifier si l'utilisateur a été redirigé depuis une autre page
             const from = history.location.state?.from?.pathname || '/tasks';
+            console.log('Redirection vers:', from);
             history.push(from);
         }
     }, [isAuthenticated, history]);
@@ -32,30 +34,62 @@ const Login = () => {
         setIsLoading(true);
         
         try {
-            await login({ email, password });
-            // La redirection est gérée par le contexte d'authentification
-            // via l'effet qui surveille isAuthenticated
+            const result = await login({ email, password });
+            
+            if (result && result.success) {
+                // Ajouter un petit délai pour s'assurer que l'état est mis à jour
+                await new Promise(resolve => setTimeout(resolve, 100));
+                return;
+            }
+            
+            // Si on arrive ici, il y a une erreur inattendue
+            console.error('Réponse inattendue du serveur:', result);
+            throw new Error('Erreur inattendue lors de la connexion');
+            
         } catch (error) {
+            console.error('Erreur de connexion:', error);
             let errorMessage = 'Email ou mot de passe incorrect.';
             
+            // Vérifier d'abord si c'est une erreur de validation Laravel
             if (error.response) {
-                // Erreur du serveur avec un statut de réponse
+                // Erreur de validation (422)
                 if (error.response.status === 422 && error.response.data.errors) {
                     const firstError = Object.values(error.response.data.errors)[0];
                     errorMessage = Array.isArray(firstError) ? firstError[0] : 'Données invalides';
-                } else if (error.response.data.message) {
-                    errorMessage = error.response.data.message;
-                } else if (error.response.status === 500) {
+                } 
+                // Erreur d'authentification (401)
+                else if (error.response.status === 401) {
+                    errorMessage = 'Email ou mot de passe incorrect.';
+                } 
+                // Erreur serveur (500)
+                else if (error.response.status === 500) {
                     errorMessage = 'Erreur serveur. Veuillez réessayer plus tard.';
                 }
-            } else if (error.request) {
-                // La requête a été faite mais aucune réponse n'a été reçue
+                // Autres erreurs avec un message
+                else if (error.response.data && error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                }
+            } 
+            // Erreur de connexion au serveur
+            else if (error.request) {
                 errorMessage = 'Le serveur ne répond pas. Vérifiez votre connexion internet.';
-            } else if (error.message) {
-                errorMessage = error.message;
+            } 
+            // Autres erreurs
+            else if (error.message) {
+                // Si c'est notre message d'erreur personnalisé
+                if (error.message === 'Impossible de se connecter au serveur') {
+                    errorMessage = 'Impossible de se connecter au serveur. Veuillez réessayer.';
+                } else {
+                    errorMessage = error.message;
+                }
             }
             
-            console.error('Erreur de connexion:', { error });
+            console.error('Détails de l\'erreur:', { 
+                message: error.message, 
+                response: error.response?.data,
+                status: error.response?.status
+            });
+            
             toast.error(errorMessage);
         } finally {
             setIsLoading(false);

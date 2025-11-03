@@ -112,7 +112,13 @@ const Register = () => {
                             required 
                         />
                     </div>
-                    <button type="submit" className="btn btn-primary w-100">Register</button>
+                    <button 
+                        type="submit" 
+                        className="btn btn-primary w-100"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Inscription en cours...' : 'S\'inscrire'}
+                    </button>
                 </form>
                 <div className="text-center mt-4">
                     <p className="text-muted">Already have an account? <Link to="/login" className="text-decoration-none">Sign in</Link></p>

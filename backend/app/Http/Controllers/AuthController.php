@@ -28,30 +28,71 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-            'device_name' => 'required',
-        ]);
+        try {
+            \Log::info('Tentative de connexion', [
+                'email' => $request->email,
+                'ip' => $request->ip(),
+                'user_agent' => $request->header('User-Agent')
+            ]);
 
-        $user = User::where('email', $request->email)->first();
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required',
+                'device_name' => 'required',
+            ]);
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+            $user = User::where('email', $request->email)->first();
+
+            if (!$user) {
+                \Log::warning('Tentative de connexion échouée - Utilisateur non trouvé', [
+                    'email' => $request->email
+                ]);
+                return response()->json([
+                    'message' => 'Les identifiants fournis sont incorrects.'
+                ], 401);
+            }
+
+            if (!Hash::check($request->password, $user->password)) {
+                \Log::warning('Tentative de connexion échouée - Mot de passe incorrect', [
+                    'email' => $request->email
+                ]);
+                return response()->json([
+                    'message' => 'Les identifiants fournis sont incorrects.'
+                ], 401);
+            }
+
+            // Supprimer les anciens tokens
+            $user->tokens()->where('name', $request->device_name)->delete();
+
+            // Créer un nouveau token
+            $token = $user->createToken($request->device_name)->plainTextToken;
+
+            \Log::info('Connexion réussie', [
+                'user_id' => $user->id,
+                'email' => $user->email
+            ]);
+
             return response()->json([
-                'message' => 'The provided credentials are incorrect.'
-            ], 401);
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'created_at' => $user->created_at,
+                    'updated_at' => $user->updated_at
+                ],
+                'token' => $token
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Erreur lors de la tentative de connexion', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'message' => 'Une erreur est survenue lors de la connexion. Veuillez réessayer plus tard.'
+            ], 500);
         }
-
-        // Supprimer les anciens tokens
-        $user->tokens()->where('name', $request->device_name)->delete();
-
-        // Créer un nouveau token
-        $token = $user->createToken($request->device_name)->plainTextToken;
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token
-        ]);
     }
 
     public function logout()
